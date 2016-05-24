@@ -1,0 +1,55 @@
+@*
+ * This template takes a single argument, a String containing a
+ * message to display.
+ *@
+@(message: String)
+
+@*
+ * Call the `main` template with two arguments. The first
+ * argument is a `String` with the title of the page, the second
+ * argument is an `Html` object containing the body of the page.
+ *@
+@main("ToughDoc") {
+
+    @*
+     * Get an `Html` object by calling the built-in Play welcome
+     * template and passing a `String` message.
+     *@
+    <div class = "container-fluid" ng-controller="appCtrl">
+        <div class="row">
+            <form class="form-inline container" id="insert-form" ng-submit="insert()">
+                <h1> Insert </h1>
+                <div class="form-group">
+                  <div class="controls">
+                    <label>Character</label>
+                    <input type="text" ng-module="char" required/>
+                    <label>Position</label>
+                    <input type="text" ng-module="pos" required/>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-default" id="insert-button">Insert</button>
+            </form>
+        </div>
+        <div class="row">
+            <form class="form-inline container" id="delete-form" ng-submit="delete()">
+                <h1> Delete </h1>
+                <div class="form-group">
+                  <div class="controls">
+                    <label>Position</label>
+                    <input type="text" ng-module="pos" required/>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-default" id="delete-button">Delete</button>
+            </form>
+        </div>
+        <div class="row">
+            <div id="result" class="container">
+                <h1> Text </h1>
+                <pre>
+                    Text goes here...
+                </pre>
+            </div>
+        </div>
+    </div>
+
+}
