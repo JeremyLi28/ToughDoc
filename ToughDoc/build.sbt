@@ -20,4 +20,4 @@ libraryDependencies ++= Seq(
 // other, legacy style, accesses its actions statically.
 routesGenerator := InjectedRoutesGenerator
 
-fork in run := true
+//fork in run := true
