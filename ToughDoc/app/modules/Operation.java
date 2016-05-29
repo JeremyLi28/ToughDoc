@@ -1,17 +1,16 @@
 package modules;
 
 import java.io.Serializable;
+import controllers.Application.*;
 
 /**
  * Operation.
  */
 
-enum Type {
-    Insert, Delete
-}
+
 public abstract class Operation implements Serializable{
 
-    private int docID;
+    private int docID = 0;
     private Type type;
     public Operation() {}
     public Operation(int docID, Type type) {

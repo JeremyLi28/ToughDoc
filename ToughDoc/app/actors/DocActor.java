@@ -6,24 +6,34 @@ import akka.actor.*;
 import controllers.Application.*;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import modules.*;
 
 public class DocActor extends UntypedActor {
-    public static Props props() {
-        return Props.create(DocActor.class);
+    public static Props props(DocBus bus, int docId) {
+        return Props.create(DocActor.class, bus);
     }
 
-    private final ArrayList<ActorRef> users = new ArrayList<>();
+    private final HashMap<Integer, ActorRef> users = new HashMap<>();
+    private final DocBus bus;
+    private int userCount;
     private final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+
+    public DocActor(DocBus bus) {
+        this.bus = bus;
+        this.userCount = 0;
+    }
+
 
     private void addUser(ActorRef user) {
         log.info("add user");
-        users.add(user);
+        user.tell();
+        users.put(userCount, user);
         getContext().watch(user);
     }
 
-    private void removeUser(ActorRef user) {
+    private void removeUser(ActorRef user, int userId) {
         log.info("remove user");
-        users.remove(user);
+        users.remove(userId);
     }
 
     @Override
@@ -33,6 +43,12 @@ public class DocActor extends UntypedActor {
         }
         else if (message instanceof Exit) {
             removeUser(getSender());
+        }
+        else if (message instanceof Insert) {
+
+        }
+        else if (message instanceof Delete) {
+
         }
         else {
             unhandled(message);

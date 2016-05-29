@@ -11,6 +11,7 @@ public class UserActor extends UntypedActor {
         return Props.create(UserActor.class, out);
     }
 
+    private  int userId;
     private final ActorRef out;
     private final ActorSelection doc;
     private final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
@@ -21,10 +22,18 @@ public class UserActor extends UntypedActor {
         this.doc = getContext().actorSelection("/user/doc");
     }
 
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
     @Override
     public void preStart() {
         log.info("preStart");
-        doc.tell(new Join(), getSelf());
+        doc.tell(new Join(0), getSelf());
     }
 
     @Override
