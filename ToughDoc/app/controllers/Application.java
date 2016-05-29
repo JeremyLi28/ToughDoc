@@ -37,30 +37,51 @@ public class Application extends Controller {
 
     public static class Exit implements Serializable {
         public int userId;
-        public ArrayList<Integer> docId = new ArrayList<>();
+        public int docId;
+        public Exit(int userId) {
+            this.userId = userId;
+            this.docId = docId;
+        }
     }
 
     public static class JoinDoc implements Serializable {
         public int userId;
         public int docId;
+        public JoinDoc(int userId, int docId) {
+            this.userId = userId;
+            this.docId = docId;
+        }
     }
 
     public static class LeaveDoc implements Serializable {
         public int userId;
         public int docId;
+        public LeaveDoc(int userId, int docId) {
+            this.userId = userId;
+            this.docId = docId;
+        }
     }
 
     // doc message
     public static class AllowJoin implements Serializable {
         public int userId;
+        public AllowJoin(int userId) {
+            this.userId = userId;
+        }
     }
 
     public static class AllowJoinDoc implements Serializable {
         public int docId;
+        public AllowJoinDoc(int docId) {
+            this.docId = docId;
+        }
     }
 
     public static class AllowLeaveDoc implements Serializable {
         public int docId;
+        public AllowLeaveDoc(int docId) {
+            this.docId = docId;
+        }
     }
 
     public WebSocket<String> ws() {
