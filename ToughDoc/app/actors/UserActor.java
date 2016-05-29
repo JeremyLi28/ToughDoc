@@ -2,6 +2,8 @@ package actors;
 
 import akka.actor.*;
 import controllers.Application.*;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
 
 public class UserActor extends UntypedActor {
 
@@ -11,14 +13,17 @@ public class UserActor extends UntypedActor {
 
     private final ActorRef out;
     private final ActorSelection doc;
+    private final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
     public UserActor(ActorRef out) {
+        log.info("UserActor");
         this.out = out;
         this.doc = getContext().actorSelection("/user/doc");
     }
 
     @Override
     public void preStart() {
+        log.info("preStart");
         doc.tell(new Join(), getSelf());
     }
 
