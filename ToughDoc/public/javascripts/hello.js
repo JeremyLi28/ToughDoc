@@ -3,7 +3,9 @@ var app = angular.module('ToughDoc', []);
 app.controller('appCtrl', function($scope){
     $scope.ws = new WebSocket("ws://localhost:9000/ws");
     $scope.ws.onmessage = function(event) {
-        $scope.text = event.data;
+        $scope.$apply(function() {
+            $scope.text = event.data;
+        });
     }
 
 
