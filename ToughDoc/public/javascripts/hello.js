@@ -6,14 +6,42 @@ app.controller('appCtrl', function($scope){
         $scope.$apply(function() {
             $scope.text = event.data;
         });
-    }
+    };
+    
+    $scope.createDoc = function () {
+        
+    };
 
-
+    $scope.joinDoc = function () {
+        var query = (JSON.stringify({
+            type: "JoinDoc",
+            docId: $scope.doc
+        }));
+        $scope.ws.send(query);
+    };
+    
+    $scope.leaveDoc = function () {
+        var query = (JSON.stringify({
+            type: "LeaveDoc",
+            docId: $scope.doc
+        }));
+        $scope.ws.send(query);
+    };
+    
     $scope.insert = function(){
-        $scope.ws.send("Insert "+ $scope.char+" at "+$scope.pos);
+        var query = (JSON.stringify({
+            type: "Insert",
+            char: $scope.char,
+            pos: $scope.pos
+        }));
+        $scope.ws.send(query);
     };
     
     $scope.delete = function(){
-        $scope.ws.send("Delete "+$scope.pos);
+        var query = (JSON.stringify({
+            type: "Delete",
+            pos: $scope.pos
+        }));
+        $scope.ws.send(query);
     };
 });

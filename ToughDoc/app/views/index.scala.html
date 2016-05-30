@@ -17,6 +17,42 @@
      *@
     <div class = "container-fluid" ng-controller="appCtrl">
         <div class="row">
+            <form class="form-inline container" id="insert-form" ng-submit="createDoc()">
+                <h1> createDoc </h1>
+                <div class="form-group">
+                    <div class="controls">
+                        <label>DocId</label>
+                        <input type="text" ng-model="doc" required/>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-default" id="insert-button">createDoc</button>
+            </form>
+        </div>
+        <div class="row">
+            <form class="form-inline container" id="insert-form" ng-submit="joinDoc()">
+                <h1> JoinDoc </h1>
+                <div class="form-group">
+                    <div class="controls">
+                        <label>DocId</label>
+                        <input type="text" ng-model="doc" required/>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-default" id="insert-button">JoinDoc</button>
+            </form>
+        </div>
+        <div class="row">
+            <form class="form-inline container" id="insert-form" ng-submit="leaveDoc()">
+                <h1> LeaveDoc </h1>
+                <div class="form-group">
+                    <div class="controls">
+                        <label>DocId</label>
+                        <input type="text" ng-model="doc" required/>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-default" id="insert-button">LeaveDoc</button>
+            </form>
+        </div>
+        <div class="row">
             <form class="form-inline container" id="insert-form" ng-submit="insert()">
                 <h1> Insert </h1>
                 <div class="form-group">
