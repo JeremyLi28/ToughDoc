@@ -5,6 +5,7 @@ app.controller('appCtrl', function($scope){
     $scope.ws.onmessage = function(event) {
         $scope.$apply(function() {
             $scope.text = event.data;
+            console.log($scope.text);
         });
     };
     

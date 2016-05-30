@@ -1,9 +1,14 @@
 package actors;
 
 import akka.actor.*;
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import controllers.Application.*;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import play.libs.Json;
+import com.fasterxml.jackson.databind.JsonNode;
+
 import java.util.*;
 
 public class UserActor extends UntypedActor {
@@ -24,6 +29,10 @@ public class UserActor extends UntypedActor {
         this.out = out;
     }
 
+    public int getDocId() {
+        return docId;
+    }
+
 
     @Override
     public void preStart() {
@@ -35,7 +44,19 @@ public class UserActor extends UntypedActor {
     @Override
     public void onReceive(Object message) throws Exception {
         if (message instanceof String) {
-            out.tell("I received your message: " + message, self());
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode json = mapper.readTree((String)message);
+            switch (json.get("type").textValue()) {
+                case "JoinDoc":
+                    doc.tell(new JoinDoc(userId, json.get("docId").asInt()), getSelf());
+                    break;
+                case "LeaveDoc":
+                    break;
+                case "Insert":
+                    break;
+                case "Delete":
+                    break;
+            }
         }
         else if(message instanceof AllowJoin) {
             this.userId = ((AllowJoin) message).userId;
@@ -62,9 +83,6 @@ public class UserActor extends UntypedActor {
         doc.tell(new Exit(userId), getSelf());
     }
 
-    public void JoinDoc(int docId) {
-        doc.tell(new JoinDoc(userId,docId), getSelf());
-    }
 
     public void LeaveDoc(int docId) {
         doc.tell(new LeaveDoc(userId, docId), getSelf());

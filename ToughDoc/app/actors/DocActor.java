@@ -23,6 +23,7 @@ public class DocActor extends UntypedActor {
     public DocActor(DocBus bus) {
         this.bus = bus;
         this.userCount = 0;
+        this.docs.add(0);
     }
 
     public void createDoc() {
