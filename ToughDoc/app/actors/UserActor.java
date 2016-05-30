@@ -28,7 +28,7 @@ public class UserActor extends UntypedActor {
     @Override
     public void preStart() {
         log.info("preStart");
-        System.out.println("User: Require for Join");
+        System.out.println("NewUser: Require for Join");
         doc.tell(new Join(), getSelf());
     }
 
@@ -36,18 +36,19 @@ public class UserActor extends UntypedActor {
     public void onReceive(Object message) throws Exception {
         if (message instanceof String) {
             out.tell("I received your message: " + message, self());
-            System.out.println("User: Require for Join");
-            doc.tell(new Join(), getSelf());
         }
         else if(message instanceof AllowJoin) {
-            System.out.println("User: Receive Join grant");
             this.userId = ((AllowJoin) message).userId;
+            System.out.println("User"+userId+": Receive Join grant");
         }
         else if(message instanceof AllowJoinDoc) {
             this.docId = ((AllowJoinDoc) message).docId;
+            System.out.println("User"+userId+": Receive JoinDoc grant for doc" + docId);
+
         }
         else if(message instanceof AllowLeaveDoc) {
             this.docId = ((AllowLeaveDoc) message).docId;
+            System.out.println("User"+userId+": Receive LeaveDoc grant for doc" + docId);
         }
         else {
             unhandled(message);
@@ -57,6 +58,7 @@ public class UserActor extends UntypedActor {
     @Override
     public void postStop() {
         log.info("Exit");
+        System.out.println("User" + userId+ ": Exit");
         doc.tell(new Exit(userId), getSelf());
     }
 

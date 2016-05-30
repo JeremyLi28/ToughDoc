@@ -38,7 +38,7 @@ public class DocActor extends UntypedActor {
         if(message instanceof Join) {
             ActorRef user = getSender();
             log.info("new user join");
-            System.out.println("Doc: Receive User Join, send grant");
+            System.out.println("Doc: Receive New User Join, assign ID" + userCount + "send grant");
             userCount++;
             users.put(userCount, user);
             getContext().watch(user);
@@ -46,18 +46,21 @@ public class DocActor extends UntypedActor {
         }
         else if (message instanceof Exit) {
             log.info("remove user");
+            System.out.println("Doc: Receive User" + ((Exit) message).userId+" Exit");
             ActorRef user = getSender();
             bus.unsubscribe(user);
             users.remove(((Exit) message).userId);
         }
         else if (message instanceof JoinDoc) {
             log.info("JoinDoc");
+            System.out.println("Doc: Receive User" + ((JoinDoc) message).userId+" JoinDoc "+((JoinDoc) message).docId);
             ActorRef user = getSender();
             bus.subscribe(user, ((JoinDoc) message).docId);
             user.tell(new AllowJoinDoc(((JoinDoc) message).docId), getSelf());
         }
         else if (message instanceof LeaveDoc) {
             log.info("LeaveDoc");
+            System.out.println("Doc: Receive User" + ((LeaveDoc) message).userId+" LeaveDoc "+((LeaveDoc) message).docId);
             ActorRef user = getSender();
             bus.unsubscribe(user, ((LeaveDoc) message).docId);
             user.tell(new AllowLeaveDoc(((LeaveDoc) message).docId), getSelf());
