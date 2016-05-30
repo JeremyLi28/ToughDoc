@@ -26,9 +26,11 @@ public class Application extends Controller {
     }
 
     // centeral components
-    private final ActorSystem system = ActorSystem.create("ToughDoc");
+    public static final ActorSystem system = ActorSystem.create("ToughDoc");
     private final DocBus bus = new DocBus();
     private final ActorRef doc = system.actorOf(Props.create(DocActor.class, bus), "doc");
+
+
 
     // messages
 
@@ -37,10 +39,8 @@ public class Application extends Controller {
 
     public static class Exit implements Serializable {
         public int userId;
-        public int docId;
         public Exit(int userId) {
             this.userId = userId;
-            this.docId = docId;
         }
     }
 

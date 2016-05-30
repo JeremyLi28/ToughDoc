@@ -37,7 +37,8 @@ public class DocActor extends UntypedActor {
     public void onReceive(Object message) throws Exception {
         if(message instanceof Join) {
             ActorRef user = getSender();
-            log.info("add user");
+            log.info("new user join");
+            System.out.println("Doc: Receive User Join, send grant");
             userCount++;
             users.put(userCount, user);
             getContext().watch(user);
@@ -68,6 +69,7 @@ public class DocActor extends UntypedActor {
 
         }
         else {
+            System.out.println("Doc: Receive unhandled message");
             unhandled(message);
         }
     }
