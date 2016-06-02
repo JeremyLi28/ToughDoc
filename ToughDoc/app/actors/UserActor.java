@@ -22,7 +22,8 @@ public class UserActor extends UntypedActor {
     private int docId = 0;
     private final ActorRef out;
     private final ActorSelection doc = controllers.Application.system.actorSelection("/user/doc");
-    ;
+    private final ObjectMapper mapper = new ObjectMapper();
+
     private final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
     public UserActor(ActorRef out) {
@@ -46,7 +47,6 @@ public class UserActor extends UntypedActor {
     @Override
     public void onReceive(Object message) throws Exception {
         if (message instanceof String) {
-            ObjectMapper mapper = new ObjectMapper();
             JsonNode json = mapper.readTree((String)message);
             switch (json.get("type").textValue()) {
                 case "JoinDoc":
@@ -55,7 +55,7 @@ public class UserActor extends UntypedActor {
                 case "LeaveDoc":
                     break;
                 case "Insert":
-                    doc.tell(new Insert(json.get("char").asText(), json.get("pos").asInt(), docId), getSelf());
+                    doc.tell(new Insert(json.get("character").asText(), json.get("position").asInt(), docId), getSelf());
                     System.out.println("User"+userId+": Receive Insert from front-end");
                     break;
                 case "Delete":
@@ -76,6 +76,7 @@ public class UserActor extends UntypedActor {
             System.out.println("User"+userId+": Receive LeaveDoc grant for doc" + docId);
         }
         else if(message instanceof Insert) {
+            out.tell(mapper.writeValueAsString(message), getSelf());
             System.out.println("User"+userId+": Receive Insert request: Insert " + ((Insert) message).getCharacter()+" at "+((Insert) message).getPosition()+" for "+((Insert) message).getDocID());
         }
         else if(message instanceof Delete) {

@@ -32,8 +32,8 @@ app.controller('appCtrl', function($scope){
     $scope.insert = function(){
         var query = (JSON.stringify({
             type: "Insert",
-            char: $scope.char,
-            pos: $scope.pos
+            character: $scope.char,
+            position: $scope.pos
         }));
         $scope.ws.send(query);
     };
@@ -41,7 +41,7 @@ app.controller('appCtrl', function($scope){
     $scope.delete = function(){
         var query = (JSON.stringify({
             type: "Delete",
-            pos: $scope.pos
+            position: $scope.pos
         }));
         $scope.ws.send(query);
     };
