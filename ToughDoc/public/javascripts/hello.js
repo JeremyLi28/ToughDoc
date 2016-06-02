@@ -1,7 +1,7 @@
 var app = angular.module('ToughDoc', []);
 
 app.controller('appCtrl', function($scope){
-    $scope.ws = new WebSocket("ws://localhost:9000/ws");
+    $scope.ws = new WebSocket("ws://http://ec2-52-36-57-249.us-west-2.compute.amazonaws.com:9000/ws");
     $scope.text = "";
 
     String.prototype.insert = function(idx, str) {
