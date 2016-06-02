@@ -16,20 +16,21 @@
      * template and passing a `String` message.
      *@
     <div class = "container-fluid" ng-controller="appCtrl">
+        <h1> ToughDoc </h1>
         <div class="row">
-            <form class="form-inline container" id="insert-form" ng-submit="createDoc()">
-                <h1> createDoc </h1>
+            <form class="form-inline container" id="create-doc-form" ng-submit="createDoc()">
+                <h1> CreateDoc </h1>
                 <div class="form-group">
                     <div class="controls">
                         <label>DocId</label>
                         <input type="text" ng-model="create_doc_id" required/>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-default" id="insert-button">createDoc</button>
+                <button type="submit" class="btn btn-default" id="create-doc-button">CreateDoc</button>
             </form>
         </div>
         <div class="row">
-            <form class="form-inline container" id="insert-form" ng-submit="joinDoc()">
+            <form class="form-inline container" id="join-doc-form" ng-submit="joinDoc()">
                 <h1> JoinDoc </h1>
                 <div class="form-group">
                     <div class="controls">
@@ -37,11 +38,11 @@
                         <input type="text" ng-model="join_doc_id" required/>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-default" id="insert-button">JoinDoc</button>
+                <button type="submit" class="btn btn-default" id="join-doc-button">JoinDoc</button>
             </form>
         </div>
         <div class="row">
-            <form class="form-inline container" id="insert-form" ng-submit="leaveDoc()">
+            <form class="form-inline container" id="leave-doc-form" ng-submit="leaveDoc()">
                 <h1> LeaveDoc </h1>
                 <div class="form-group">
                     <div class="controls">
@@ -49,7 +50,7 @@
                         <input type="text" ng-model="leave_doc_id" required/>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-default" id="insert-button">LeaveDoc</button>
+                <button type="submit" class="btn btn-default" id="leave-doc-button">LeaveDoc</button>
             </form>
         </div>
         <div class="row">
