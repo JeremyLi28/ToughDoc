@@ -21,5 +21,7 @@ public abstract class Operation implements Serializable{
     public int getDocID() {
         return docID;
     }
+
+    public Type getType() { return type; }
 }
 
