@@ -59,6 +59,8 @@ public class UserActor extends UntypedActor {
                     System.out.println("User"+userId+": Receive Insert from front-end");
                     break;
                 case "Delete":
+                    doc.tell(new Delete(json.get("position").asInt(), docId), getSelf());
+                    System.out.println("User"+userId+": Receive Delete from front-end");
                     break;
             }
         }
@@ -80,7 +82,8 @@ public class UserActor extends UntypedActor {
             System.out.println("User"+userId+": Receive Insert request: Insert " + ((Insert) message).getCharacter()+" at "+((Insert) message).getPosition()+" for "+((Insert) message).getDocID());
         }
         else if(message instanceof Delete) {
-
+            out.tell(mapper.writeValueAsString(message), getSelf());
+            System.out.println("User"+userId+": Receive Delete request: Delete character at "+((Delete) message).getPosition()+" for "+((Delete) message).getDocID());
         }
         else {
             unhandled(message);

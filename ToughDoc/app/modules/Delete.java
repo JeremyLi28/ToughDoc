@@ -5,5 +5,13 @@ import controllers.Application.*;
  * Delete.
  */
 public class Delete extends Operation{
-    private Type type = Type.Delete;
+    private int position;
+    public Delete(int position, int docId) {
+        super(docId, Type.Delete);
+        this.position = position;
+    }
+
+    public int getPosition() {
+        return position;
+    }
 }

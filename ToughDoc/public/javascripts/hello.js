@@ -16,7 +16,7 @@ app.controller('appCtrl', function($scope){
     $scope.joinDoc = function () {
         var query = (JSON.stringify({
             type: "JoinDoc",
-            docId: $scope.doc
+            docId: $scope.join_doc_id
         }));
         $scope.ws.send(query);
     };
@@ -24,7 +24,7 @@ app.controller('appCtrl', function($scope){
     $scope.leaveDoc = function () {
         var query = (JSON.stringify({
             type: "LeaveDoc",
-            docId: $scope.doc
+            docId: $scope.leave_doc_id
         }));
         $scope.ws.send(query);
     };
@@ -33,7 +33,7 @@ app.controller('appCtrl', function($scope){
         var query = (JSON.stringify({
             type: "Insert",
             character: $scope.char,
-            position: $scope.pos
+            position: $scope.insert_pos
         }));
         $scope.ws.send(query);
     };
@@ -41,7 +41,7 @@ app.controller('appCtrl', function($scope){
     $scope.delete = function(){
         var query = (JSON.stringify({
             type: "Delete",
-            position: $scope.pos
+            position: $scope.delete_pos
         }));
         $scope.ws.send(query);
     };

@@ -68,10 +68,11 @@ public class DocActor extends UntypedActor {
         }
         else if (message instanceof Insert) {
             System.out.println("Doc: Receive Insert request from user: Insert " + ((Insert) message).getCharacter()+" at "+((Insert) message).getPosition()+" for "+((Insert) message).getDocID());
-            bus.publish(message);
+            bus.publish((Insert)message);
         }
         else if (message instanceof Delete) {
-
+            System.out.println("Doc: Receive Delete request from user: Delete character at "+((Delete) message).getPosition()+" for "+((Delete) message).getDocID());
+            bus.publish((Delete)message);
         }
         else {
             System.out.println("Doc: Receive unhandled message");
