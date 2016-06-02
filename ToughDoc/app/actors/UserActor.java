@@ -9,8 +9,11 @@ import akka.event.LoggingAdapter;
 import play.libs.Json;
 import com.fasterxml.jackson.databind.JsonNode;
 import modules.*;
+import play.mvc.WebSocket;
+import scala.concurrent.duration.Duration;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class UserActor extends UntypedActor {
 
@@ -22,8 +25,11 @@ public class UserActor extends UntypedActor {
     private int docId = 0;
     private final ActorRef out;
     private final ActorSelection doc = controllers.Application.system.actorSelection("/user/doc");
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final Queue<Operation> operationQueue = new LinkedList<>();
+    private final Cancellable cancellable = getContext().system().scheduler().schedule(Duration.Zero(),
+            Duration.create(50, TimeUnit.MILLISECONDS), getSelf(), new Execute(), getContext().system().dispatcher(), null);
 
+    private final ObjectMapper mapper = new ObjectMapper();
     private final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
     public UserActor(ActorRef out) {
@@ -55,11 +61,15 @@ public class UserActor extends UntypedActor {
                 case "LeaveDoc":
                     break;
                 case "Insert":
-                    doc.tell(new Insert(userId, docId, json.get("character").asText(), json.get("position").asInt()), getSelf());
+                    Insert insert = new Insert(userId, docId, json.get("character").asText(), json.get("position").asInt());
+                    operationQueue.add(insert);
+                    doc.tell(insert, getSelf());
                     System.out.println("User"+userId+": Receive Insert from front-end");
                     break;
                 case "Delete":
-                    doc.tell(new Delete(userId, docId, json.get("position").asInt()), getSelf());
+                    Delete delete = new Delete(userId, docId, json.get("position").asInt());
+                    operationQueue.add(delete);
+                    doc.tell(delete, getSelf());
                     System.out.println("User"+userId+": Receive Delete from front-end");
                     break;
             }
@@ -78,12 +88,20 @@ public class UserActor extends UntypedActor {
             System.out.println("User"+userId+": Receive LeaveDoc grant for doc" + docId);
         }
         else if(message instanceof Insert) {
-            out.tell(mapper.writeValueAsString(message), getSelf());
-            System.out.println("User"+userId+": Receive Insert request: Insert " + ((Insert) message).getCharacter()+" at "+((Insert) message).getPosition()+" for "+((Insert) message).getDocID());
+            if (((Insert) message).getUserID() != userId) {
+                operationQueue.add((Insert)message);
+                System.out.println("User" + userId + ": Receive Insert request: Insert " + ((Insert) message).getCharacter() + " at " + ((Insert) message).getPosition() + " for " + ((Insert) message).getDocID());
+            }
         }
         else if(message instanceof Delete) {
-            out.tell(mapper.writeValueAsString(message), getSelf());
-            System.out.println("User"+userId+": Receive Delete request: Delete character at "+((Delete) message).getPosition()+" for "+((Delete) message).getDocID());
+            if(((Delete) message).getUserID() != userId) {
+                operationQueue.add((Delete)message);
+                System.out.println("User" + userId + ": Receive Delete request: Delete character at " + ((Delete) message).getPosition() + " for " + ((Delete) message).getDocID());
+            }
+        }
+        else if(message instanceof Execute) {
+            if(!operationQueue.isEmpty())
+                out.tell(mapper.writeValueAsString(operationQueue.remove()), getSelf());
         }
         else {
             unhandled(message);
@@ -95,6 +113,7 @@ public class UserActor extends UntypedActor {
         log.info("Exit");
         System.out.println("User" + userId+ ": Exit");
         doc.tell(new Exit(userId), getSelf());
+        cancellable.cancel();
     }
 
 }

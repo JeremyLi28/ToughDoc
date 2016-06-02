@@ -62,6 +62,8 @@ public class Application extends Controller {
         }
     }
 
+    public static class Execute implements Serializable {}
+
     // doc message
     public static class AllowJoin implements Serializable {
         public int userId;
