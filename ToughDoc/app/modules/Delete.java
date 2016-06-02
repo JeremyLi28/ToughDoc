@@ -6,8 +6,8 @@ import controllers.Application.*;
  */
 public class Delete extends Operation{
     private int position;
-    public Delete(int position, int docId) {
-        super(docId, Type.Delete);
+    public Delete(int userId, int docId, int position) {
+        super(userId, docId, Type.Delete);
         this.position = position;
     }
 

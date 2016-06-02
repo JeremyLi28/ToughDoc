@@ -67,11 +67,11 @@ public class DocActor extends UntypedActor {
             user.tell(new AllowLeaveDoc(((LeaveDoc) message).docId), getSelf());
         }
         else if (message instanceof Insert) {
-            System.out.println("Doc: Receive Insert request from user: Insert " + ((Insert) message).getCharacter()+" at "+((Insert) message).getPosition()+" for "+((Insert) message).getDocID());
+            System.out.println("Doc: Receive Insert request from user"+((Insert) message).getUserID()+": Insert " + ((Insert) message).getCharacter()+" at "+((Insert) message).getPosition()+" for "+((Insert) message).getDocID());
             bus.publish((Insert)message);
         }
         else if (message instanceof Delete) {
-            System.out.println("Doc: Receive Delete request from user: Delete character at "+((Delete) message).getPosition()+" for "+((Delete) message).getDocID());
+            System.out.println("Doc: Receive Delete request from user"+((Delete) message).getUserID()+": Delete character at "+((Delete) message).getPosition()+" for "+((Delete) message).getDocID());
             bus.publish((Delete)message);
         }
         else {

@@ -10,13 +10,16 @@ import controllers.Application.*;
 
 public abstract class Operation implements Serializable{
 
-    private int docID = 0;
+    private int docID;
+    private int userID;
     private Type type;
-    public Operation() {}
-    public Operation(int docID, Type type) {
+    public Operation(int userID, int docID, Type type) {
+        this.userID = userID;
         this.docID = docID;
         this.type = type;
     }
+
+    public int getUserID() { return userID; }
 
     public int getDocID() {
         return docID;

@@ -55,11 +55,11 @@ public class UserActor extends UntypedActor {
                 case "LeaveDoc":
                     break;
                 case "Insert":
-                    doc.tell(new Insert(json.get("character").asText(), json.get("position").asInt(), docId), getSelf());
+                    doc.tell(new Insert(userId, docId, json.get("character").asText(), json.get("position").asInt()), getSelf());
                     System.out.println("User"+userId+": Receive Insert from front-end");
                     break;
                 case "Delete":
-                    doc.tell(new Delete(json.get("position").asInt(), docId), getSelf());
+                    doc.tell(new Delete(userId, docId, json.get("position").asInt()), getSelf());
                     System.out.println("User"+userId+": Receive Delete from front-end");
                     break;
             }
