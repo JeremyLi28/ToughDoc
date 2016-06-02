@@ -8,6 +8,10 @@ app.controller('appCtrl', function($scope){
         return this.slice(0, idx) + str + this.slice(idx);
     };
 
+    String.prototype.delete = function(idx) {
+        return this.slice(0, idx) + this.slice(idx+1);
+    };
+
     $scope.ws.onmessage = function(event) {
 
         $scope.$apply(function() {
@@ -17,6 +21,7 @@ app.controller('appCtrl', function($scope){
                     $scope.text = $scope.text.insert(json.position, json.character);
                     break;
                 case "Delete":
+                    $scope.text = $scope.text.delete(json.position);
                     break;
             }
         });
