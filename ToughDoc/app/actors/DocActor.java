@@ -67,7 +67,8 @@ public class DocActor extends UntypedActor {
             user.tell(new AllowLeaveDoc(((LeaveDoc) message).docId), getSelf());
         }
         else if (message instanceof Insert) {
-
+            System.out.println("Doc: Receive Insert request from user: Insert " + ((Insert) message).getCharacter()+" at "+((Insert) message).getPosition()+" for "+((Insert) message).getDocID());
+            bus.publish(message);
         }
         else if (message instanceof Delete) {
 

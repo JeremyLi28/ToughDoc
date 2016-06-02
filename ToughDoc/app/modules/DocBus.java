@@ -4,26 +4,26 @@ package modules;
 import akka.actor.ActorRef;
 import akka.event.japi.LookupEventBus;
 
-import java.util.Objects;
 
-public class DocBus extends LookupEventBus{
+public class DocBus extends LookupEventBus<Operation, ActorRef, Integer>{
     @Override
     public int mapSize() {
-        return 5;
+        return 128;
     }
 
     @Override
-    public int compareSubscribers(Object a, Object b) {
-        return ((Operation)a).getDocID() - ((Operation)b).getDocID();
+    public int compareSubscribers(ActorRef a, ActorRef b) {
+//        return ((UserActor)a).getDocId() - ((UserActor)b).getDocId();
+        return a.compareTo(b);
     }
 
     @Override
-    public Object classify(Object operation) {
-        return ((Operation)operation).getDocID();
+    public Integer classify(Operation operation) {
+        return (operation).getDocID();
     }
 
     @Override
-    public void publish(Object operation, Object subscriber) {
-        ((ActorRef)subscriber).tell(operation, ActorRef.noSender());
+    public void publish(Operation operation, ActorRef subscriber) {
+        subscriber.tell(operation, ActorRef.noSender());
     }
 }

@@ -8,6 +8,7 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import play.libs.Json;
 import com.fasterxml.jackson.databind.JsonNode;
+import modules.*;
 
 import java.util.*;
 
@@ -18,7 +19,7 @@ public class UserActor extends UntypedActor {
     }
 
     private int userId;
-    private int docId = -1;
+    private int docId = 0;
     private final ActorRef out;
     private final ActorSelection doc = controllers.Application.system.actorSelection("/user/doc");
     ;
@@ -39,6 +40,7 @@ public class UserActor extends UntypedActor {
         log.info("preStart");
         System.out.println("NewUser: Require for Join");
         doc.tell(new Join(), getSelf());
+        doc.tell(new JoinDoc(userId, 0), getSelf());
     }
 
     @Override
@@ -53,6 +55,8 @@ public class UserActor extends UntypedActor {
                 case "LeaveDoc":
                     break;
                 case "Insert":
+                    doc.tell(new Insert(json.get("char").asText(), json.get("pos").asInt(), docId), getSelf());
+                    System.out.println("User"+userId+": Receive Insert from front-end");
                     break;
                 case "Delete":
                     break;
@@ -71,6 +75,12 @@ public class UserActor extends UntypedActor {
             this.docId = ((AllowLeaveDoc) message).docId;
             System.out.println("User"+userId+": Receive LeaveDoc grant for doc" + docId);
         }
+        else if(message instanceof Insert) {
+            System.out.println("User"+userId+": Receive Insert request: Insert " + ((Insert) message).getCharacter()+" at "+((Insert) message).getPosition()+" for "+((Insert) message).getDocID());
+        }
+        else if(message instanceof Delete) {
+
+        }
         else {
             unhandled(message);
         }
@@ -83,9 +93,5 @@ public class UserActor extends UntypedActor {
         doc.tell(new Exit(userId), getSelf());
     }
 
-
-    public void LeaveDoc(int docId) {
-        doc.tell(new LeaveDoc(userId, docId), getSelf());
-    }
 }
 
