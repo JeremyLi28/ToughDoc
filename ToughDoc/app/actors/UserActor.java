@@ -27,7 +27,7 @@ public class UserActor extends UntypedActor {
     private final ActorSelection doc = controllers.Application.system.actorSelection("/user/doc");
     private final Queue<Operation> requestQueue = new LinkedList<>();
     private final ArrayList<Operation> requestLog = new ArrayList<>();
-    private final ArrayList<Integer> stateVectors = new ArrayList<>();
+    private final ArrayList<Integer> stateVectors = new ArrayList<>(Arrays.asList(0,0));
     private final int priority = 0;
     private final Cancellable cancellable = getContext().system().scheduler().schedule(Duration.Zero(),
             Duration.create(50, TimeUnit.MILLISECONDS), getSelf(), new Execute(), getContext().system().dispatcher(), null);
@@ -50,7 +50,6 @@ public class UserActor extends UntypedActor {
         log.info("preStart");
         System.out.println("NewUser: Require for Join");
         doc.tell(new Join(), getSelf());
-        doc.tell(new JoinDoc(userId, 0), getSelf());
     }
 
     @Override
@@ -79,6 +78,7 @@ public class UserActor extends UntypedActor {
         }
         else if(message instanceof AllowJoin) {
             this.userId = ((AllowJoin) message).userId;
+            doc.tell(new JoinDoc(userId, 0), getSelf());
             System.out.println("User"+userId+": Receive Join grant");
         }
         else if(message instanceof AllowJoinDoc) {
@@ -103,8 +103,20 @@ public class UserActor extends UntypedActor {
             }
         }
         else if(message instanceof Execute) {
-            if(!requestQueue.isEmpty())
-                out.tell(mapper.writeValueAsString(requestQueue.remove()), getSelf());
+            if(!requestQueue.isEmpty()) {
+                Operation operation = requestQueue.remove();
+                out.tell(mapper.writeValueAsString(operation), getSelf());
+                requestLog.add(0, operation);
+                if(operation.getUserID() >= stateVectors.size()) {
+                    for(int i=0; i<operation.getUserID()-stateVectors.size()+1; i++)
+                        stateVectors.add(0);
+                }
+                stateVectors.set(operation.getUserID(), stateVectors.get(operation.getUserID())+1);
+                System.out.print("User"+userId+": Execute operation from User"+ operation.getUserID()+", stateVector: ");
+                for(int i=0; i<stateVectors.size(); i++)
+                    System.out.print(stateVectors.get(i)+" ");
+                System.out.println("");
+            }
         }
         else {
             unhandled(message);

@@ -40,10 +40,10 @@ public class DocActor extends UntypedActor {
             ActorRef user = getSender();
             log.info("new user join");
             System.out.println("Doc: Receive New User Join, assign ID" + userCount + "send grant");
-            userCount++;
             users.put(userCount, user);
             getContext().watch(user);
             user.tell(new AllowJoin(userCount), getSelf());
+            userCount++;
         }
         else if (message instanceof Exit) {
             log.info("remove user");
