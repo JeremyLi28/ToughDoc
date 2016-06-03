@@ -25,7 +25,10 @@ public class UserActor extends UntypedActor {
     private int docId = 0;
     private final ActorRef out;
     private final ActorSelection doc = controllers.Application.system.actorSelection("/user/doc");
-    private final Queue<Operation> operationQueue = new LinkedList<>();
+    private final Queue<Operation> requestQueue = new LinkedList<>();
+    private final ArrayList<Operation> requestLog = new ArrayList<>();
+    private final ArrayList<Integer> stateVectors = new ArrayList<>();
+    private final int priority = 0;
     private final Cancellable cancellable = getContext().system().scheduler().schedule(Duration.Zero(),
             Duration.create(50, TimeUnit.MILLISECONDS), getSelf(), new Execute(), getContext().system().dispatcher(), null);
 
@@ -61,14 +64,14 @@ public class UserActor extends UntypedActor {
                 case "LeaveDoc":
                     break;
                 case "Insert":
-                    Insert insert = new Insert(userId, docId, json.get("character").asText(), json.get("position").asInt());
-                    operationQueue.add(insert);
+                    Insert insert = new Insert(userId, stateVectors, priority, docId, json.get("character").asText(), json.get("position").asInt());
+                    requestQueue.add(insert);
                     doc.tell(insert, getSelf());
                     System.out.println("User"+userId+": Receive Insert from front-end");
                     break;
                 case "Delete":
-                    Delete delete = new Delete(userId, docId, json.get("position").asInt());
-                    operationQueue.add(delete);
+                    Delete delete = new Delete(userId, stateVectors, priority, docId, json.get("position").asInt());
+                    requestQueue.add(delete);
                     doc.tell(delete, getSelf());
                     System.out.println("User"+userId+": Receive Delete from front-end");
                     break;
@@ -89,19 +92,19 @@ public class UserActor extends UntypedActor {
         }
         else if(message instanceof Insert) {
             if (((Insert) message).getUserID() != userId) {
-                operationQueue.add((Insert)message);
+                requestQueue.add((Insert)message);
                 System.out.println("User" + userId + ": Receive Insert request: Insert " + ((Insert) message).getCharacter() + " at " + ((Insert) message).getPosition() + " for " + ((Insert) message).getDocID());
             }
         }
         else if(message instanceof Delete) {
             if(((Delete) message).getUserID() != userId) {
-                operationQueue.add((Delete)message);
+                requestQueue.add((Delete)message);
                 System.out.println("User" + userId + ": Receive Delete request: Delete character at " + ((Delete) message).getPosition() + " for " + ((Delete) message).getDocID());
             }
         }
         else if(message instanceof Execute) {
-            if(!operationQueue.isEmpty())
-                out.tell(mapper.writeValueAsString(operationQueue.remove()), getSelf());
+            if(!requestQueue.isEmpty())
+                out.tell(mapper.writeValueAsString(requestQueue.remove()), getSelf());
         }
         else {
             unhandled(message);
