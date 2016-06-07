@@ -14,5 +14,4 @@ Java8 & sbt
 
 In ToughDoc/ToughDoc/ directory
 
-Run `sbt run`
-
+Run `sbt run`, then login in to [localhost:9000](http://localhost:9000)
