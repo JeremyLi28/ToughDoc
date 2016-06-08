@@ -17,7 +17,7 @@ public class Insert extends Operation{
     }
 
     public Insert(Insert insert) {
-        super(insert.getUserID(), insert.getStateVector(), insert.getType(), insert.getPriority(), insert.getDocID());
+        super(insert.getUserId(), insert.getStateVector(), insert.getType(), insert.getPriority(), insert.getDocID());
         this.character = insert.character;
         this.position = insert.position;
     }

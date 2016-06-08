@@ -16,77 +16,76 @@
      * template and passing a `String` message.
      *@
     <div class = "container-fluid" ng-controller="appCtrl">
-        <h1> ToughDoc </h1>
+        <img src=@routes.Assets.versioned("images/logo.png") style="width:280px">
+        @*<div class="row">*@
+            @*<form class="form-inline container" id="create-doc-form" ng-submit="createDoc()">*@
+                @*<h1> CreateDoc </h1>*@
+                @*<div class="form-group">*@
+                    @*<div class="controls">*@
+                        @*<label>DocId</label>*@
+                        @*<input type="text" ng-model="create_doc_id" required/>*@
+                    @*</div>*@
+                @*</div>*@
+                @*<button type="submit" class="btn btn-default" id="create-doc-button">CreateDoc</button>*@
+            @*</form>*@
+        @*</div>*@
+        @*<div class="row">*@
+            @*<form class="form-inline container" id="join-doc-form" ng-submit="joinDoc()">*@
+                @*<h1> JoinDoc </h1>*@
+                @*<div class="form-group">*@
+                    @*<div class="controls">*@
+                        @*<label>DocId</label>*@
+                        @*<input type="text" ng-model="join_doc_id" required/>*@
+                    @*</div>*@
+                @*</div>*@
+                @*<button type="submit" class="btn btn-default" id="join-doc-button">JoinDoc</button>*@
+            @*</form>*@
+        @*</div>*@
+        @*<div class="row">*@
+            @*<form class="form-inline container" id="leave-doc-form" ng-submit="leaveDoc()">*@
+                @*<h1> LeaveDoc </h1>*@
+                @*<div class="form-group">*@
+                    @*<div class="controls">*@
+                        @*<label>DocId</label>*@
+                        @*<input type="text" ng-model="leave_doc_id" required/>*@
+                    @*</div>*@
+                @*</div>*@
+                @*<button type="submit" class="btn btn-default" id="leave-doc-button">LeaveDoc</button>*@
+            @*</form>*@
+        @*</div>*@
+        @*<div class="row">*@
+            @*<form class="form-inline container" id="insert-form" ng-submit="insert()">*@
+                @*<h1> Insert </h1>*@
+                @*<div class="form-group">*@
+                  @*<div class="controls">*@
+                    @*<label>Character</label>*@
+                    @*<input type="text" ng-model="char" required/>*@
+                    @*<label>Position</label>*@
+                    @*<input type="text" ng-model="insert_pos" required/>*@
+                  @*</div>*@
+                @*</div>*@
+                @*<button type="submit" class="btn btn-default" id="insert-button">Insert</button>*@
+            @*</form>*@
+        @*</div>*@
+        @*<div class="row">*@
+            @*<form class="form-inline container" id="delete-form" ng-submit="delete()">*@
+                @*<h1> Delete </h1>*@
+                @*<div class="form-group">*@
+                  @*<div class="controls">*@
+                    @*<label>Position</label>*@
+                    @*<input type="text" ng-model="delete_pos" required/>*@
+                  @*</div>*@
+                @*</div>*@
+                @*<button type="submit" class="btn btn-default" id="delete-button">Delete</button>*@
+            @*</form>*@
+        @*</div>*@
         <div class="row">
-            <form class="form-inline container" id="create-doc-form" ng-submit="createDoc()">
-                <h1> CreateDoc </h1>
-                <div class="form-group">
-                    <div class="controls">
-                        <label>DocId</label>
-                        <input type="text" ng-model="create_doc_id" required/>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-default" id="create-doc-button">CreateDoc</button>
-            </form>
-        </div>
-        <div class="row">
-            <form class="form-inline container" id="join-doc-form" ng-submit="joinDoc()">
-                <h1> JoinDoc </h1>
-                <div class="form-group">
-                    <div class="controls">
-                        <label>DocId</label>
-                        <input type="text" ng-model="join_doc_id" required/>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-default" id="join-doc-button">JoinDoc</button>
-            </form>
-        </div>
-        <div class="row">
-            <form class="form-inline container" id="leave-doc-form" ng-submit="leaveDoc()">
-                <h1> LeaveDoc </h1>
-                <div class="form-group">
-                    <div class="controls">
-                        <label>DocId</label>
-                        <input type="text" ng-model="leave_doc_id" required/>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-default" id="leave-doc-button">LeaveDoc</button>
-            </form>
-        </div>
-        <div class="row">
-            <form class="form-inline container" id="insert-form" ng-submit="insert()">
-                <h1> Insert </h1>
-                <div class="form-group">
-                  <div class="controls">
-                    <label>Character</label>
-                    <input type="text" ng-model="char" required/>
-                    <label>Position</label>
-                    <input type="text" ng-model="insert_pos" required/>
-                  </div>
-                </div>
-                <button type="submit" class="btn btn-default" id="insert-button">Insert</button>
-            </form>
-        </div>
-        <div class="row">
-            <form class="form-inline container" id="delete-form" ng-submit="delete()">
-                <h1> Delete </h1>
-                <div class="form-group">
-                  <div class="controls">
-                    <label>Position</label>
-                    <input type="text" ng-model="delete_pos" required/>
-                  </div>
-                </div>
-                <button type="submit" class="btn btn-default" id="delete-button">Delete</button>
-            </form>
-        </div>
-        <div class="row">
-            <div id="result" class="container" ng-module="text">
-                <h1> Text </h1>
-                <textarea rows="20" cols="180">
-                    {{ text }}
+            <div id="result" class="container">
+                <textarea ng-model="text" rows="20" cols="180">
                 </textarea>
             </div>
         </div>
+        <p> UserID: {{ userId}}</p>
     </div>
 
 }

@@ -81,6 +81,7 @@ public class UserActor extends UntypedActor {
             this.userId = ((AllowJoin) message).userId;
             this.priority = ((AllowJoin) message).userId;
             doc.tell(new JoinDoc(userId, 0), getSelf());
+            out.tell("{\"type\": \"Join\", \"userId\":"+this.userId+"}", getSelf());
             System.out.println("User"+userId+": Receive Join grant");
         }
         else if(message instanceof AllowJoinDoc) {
@@ -93,7 +94,7 @@ public class UserActor extends UntypedActor {
             System.out.println("User"+userId+": Receive LeaveDoc grant for doc" + docId);
         }
         else if(message instanceof Insert) {
-            if (((Insert) message).getUserID() != userId) {
+            if (((Insert) message).getUserId() != userId) {
                 requestQueue.add((Insert)message);
                 System.out.print("User" + userId + ": Receive Insert request: Insert " + ((Insert) message).getCharacter() + " at " + ((Insert) message).getPosition() + " for Doc" + ((Insert) message).getDocID());
                 printStateVector(((Insert) message).getStateVector());
@@ -102,7 +103,7 @@ public class UserActor extends UntypedActor {
             }
         }
         else if(message instanceof Delete) {
-            if(((Delete) message).getUserID() != userId) {
+            if(((Delete) message).getUserId() != userId) {
                 requestQueue.add((Delete)message);
                 System.out.print("User" + userId + ": Receive Delete request: Delete character at " + ((Delete) message).getPosition() + " for Doc" + ((Delete) message).getDocID());
                 printStateVector(((Delete) message).getStateVector());
@@ -122,10 +123,10 @@ public class UserActor extends UntypedActor {
                             Operation log = requestLog.get(i);
                             if(compareStateVector(log.getStateVector(), operation.getStateVector()) < 0)
                                 continue;
-                            if(operation.getStateVector().get(log.getUserID()) <= log.getStateVector().get(log.getUserID())) {
+                            if(operation.getStateVector().get(log.getUserId()) <= log.getStateVector().get(log.getUserId())) {
                                 switch(operation.getType()){
                                     case Insert:
-                                        System.out.print("User"+userId+": Operation from User"+ operation.getUserID()+" Insert "+((Insert)operation).getCharacter()
+                                        System.out.print("User"+userId+": Operation from User"+ operation.getUserId()+" Insert "+((Insert)operation).getCharacter()
                                                 +" at "+((Insert)operation).getPosition());
                                         operation = Application.T(operation, log);
                                         if(operation == null) {
@@ -136,7 +137,7 @@ public class UserActor extends UntypedActor {
                                                 +" at "+((Insert)operation).getPosition());
                                         break;
                                     case Delete:
-                                        System.out.print("User"+userId+": Operation from User"+ operation.getUserID()+" Delete "+" at "+((Delete)operation).getPosition());
+                                        System.out.print("User"+userId+": Operation from User"+ operation.getUserId()+" Delete "+" at "+((Delete)operation).getPosition());
                                         operation = Application.T(operation, log);
                                         if(operation == null) {
                                             System.out.print(" No Operation!");
@@ -151,19 +152,19 @@ public class UserActor extends UntypedActor {
                     }
                     out.tell(mapper.writeValueAsString(operation), getSelf());
                     requestLog.add(0, operation);
-                    if(operation.getUserID() >= stateVectors.size()) {
-                        for(int i=0; i<operation.getUserID()-stateVectors.size()+1; i++)
+                    if(operation.getUserId() >= stateVectors.size()) {
+                        for(int i=0; i<operation.getUserId()-stateVectors.size()+1; i++)
                             stateVectors.add(0);
                     }
 
-                    stateVectors.set(operation.getUserID(), stateVectors.get(operation.getUserID())+1);
+                    stateVectors.set(operation.getUserId(), stateVectors.get(operation.getUserId())+1);
                     switch(operation.getType()){
                         case Insert:
-                            System.out.print("User"+userId+": Execute operation from User"+ operation.getUserID()+" Insert "+((Insert)operation).getCharacter()
+                            System.out.print("User"+userId+": Execute operation from User"+ operation.getUserId()+" Insert "+((Insert)operation).getCharacter()
                                     +" at "+((Insert)operation).getPosition());
                             break;
                         case Delete:
-                            System.out.print("User"+userId+": Execute operation from User"+ operation.getUserID()+" Delete "+" at "+((Delete)operation).getPosition());
+                            System.out.print("User"+userId+": Execute operation from User"+ operation.getUserId()+" Delete "+" at "+((Delete)operation).getPosition());
                             break;
                     }
                     printStateVector(operation.getStateVector());
