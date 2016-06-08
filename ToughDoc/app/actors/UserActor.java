@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import modules.*;
 import play.mvc.WebSocket;
 import scala.concurrent.duration.Duration;
+import controllers.*;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -28,7 +29,7 @@ public class UserActor extends UntypedActor {
     private final Queue<Operation> requestQueue = new LinkedList<>();
     private final ArrayList<Operation> requestLog = new ArrayList<>();
     private final ArrayList<Integer> stateVectors = new ArrayList<>(Arrays.asList(0,0));
-    private final int priority = 0;
+    private int priority = 0;
     private final Cancellable cancellable = getContext().system().scheduler().schedule(Duration.Zero(),
             Duration.create(50, TimeUnit.MILLISECONDS), getSelf(), new Execute(), getContext().system().dispatcher(), null);
 
@@ -63,13 +64,13 @@ public class UserActor extends UntypedActor {
                 case "LeaveDoc":
                     break;
                 case "Insert":
-                    Insert insert = new Insert(userId, stateVectors, priority, docId, json.get("character").asText(), json.get("position").asInt());
+                    Insert insert = new Insert(userId, new ArrayList<>(stateVectors), priority, docId, json.get("character").asText(), json.get("position").asInt());
                     requestQueue.add(insert);
                     doc.tell(insert, getSelf());
                     System.out.println("User"+userId+": Receive Insert from front-end");
                     break;
                 case "Delete":
-                    Delete delete = new Delete(userId, stateVectors, priority, docId, json.get("position").asInt());
+                    Delete delete = new Delete(userId, new ArrayList<>(stateVectors), priority, docId, json.get("position").asInt());
                     requestQueue.add(delete);
                     doc.tell(delete, getSelf());
                     System.out.println("User"+userId+": Receive Delete from front-end");
@@ -78,6 +79,7 @@ public class UserActor extends UntypedActor {
         }
         else if(message instanceof AllowJoin) {
             this.userId = ((AllowJoin) message).userId;
+            this.priority = ((AllowJoin) message).userId;
             doc.tell(new JoinDoc(userId, 0), getSelf());
             System.out.println("User"+userId+": Receive Join grant");
         }
@@ -93,29 +95,81 @@ public class UserActor extends UntypedActor {
         else if(message instanceof Insert) {
             if (((Insert) message).getUserID() != userId) {
                 requestQueue.add((Insert)message);
-                System.out.println("User" + userId + ": Receive Insert request: Insert " + ((Insert) message).getCharacter() + " at " + ((Insert) message).getPosition() + " for " + ((Insert) message).getDocID());
+                System.out.print("User" + userId + ": Receive Insert request: Insert " + ((Insert) message).getCharacter() + " at " + ((Insert) message).getPosition() + " for Doc" + ((Insert) message).getDocID());
+                printStateVector(((Insert) message).getStateVector());
+                System.out.print("User"+userId+" StateVector: ");
+                printStateVector(stateVectors);
             }
         }
         else if(message instanceof Delete) {
             if(((Delete) message).getUserID() != userId) {
                 requestQueue.add((Delete)message);
-                System.out.println("User" + userId + ": Receive Delete request: Delete character at " + ((Delete) message).getPosition() + " for " + ((Delete) message).getDocID());
+                System.out.print("User" + userId + ": Receive Delete request: Delete character at " + ((Delete) message).getPosition() + " for Doc" + ((Delete) message).getDocID());
+                printStateVector(((Delete) message).getStateVector());
+                System.out.print("User"+userId+" StateVector: ");
+                printStateVector(stateVectors);
             }
         }
         else if(message instanceof Execute) {
             if(!requestQueue.isEmpty()) {
                 Operation operation = requestQueue.remove();
-                out.tell(mapper.writeValueAsString(operation), getSelf());
-                requestLog.add(0, operation);
-                if(operation.getUserID() >= stateVectors.size()) {
-                    for(int i=0; i<operation.getUserID()-stateVectors.size()+1; i++)
-                        stateVectors.add(0);
+                if(compareStateVector(operation.getStateVector(), stateVectors) > 0) {
+                    requestQueue.add(operation);
                 }
-                stateVectors.set(operation.getUserID(), stateVectors.get(operation.getUserID())+1);
-                System.out.print("User"+userId+": Execute operation from User"+ operation.getUserID()+", stateVector: ");
-                for(int i=0; i<stateVectors.size(); i++)
-                    System.out.print(stateVectors.get(i)+" ");
-                System.out.println("");
+                else {
+                    if(compareStateVector(operation.getStateVector(), stateVectors) < 0) {
+                        for(int i=0; i< requestLog.size(); i++) {
+                            Operation log = requestLog.get(i);
+                            if(compareStateVector(log.getStateVector(), operation.getStateVector()) < 0)
+                                continue;
+                            if(operation.getStateVector().get(log.getUserID()) <= log.getStateVector().get(log.getUserID())) {
+                                switch(operation.getType()){
+                                    case Insert:
+                                        System.out.print("User"+userId+": Operation from User"+ operation.getUserID()+" Insert "+((Insert)operation).getCharacter()
+                                                +" at "+((Insert)operation).getPosition());
+                                        operation = Application.T(operation, log);
+                                        if(operation == null) {
+                                            System.out.print(" No Operation!");
+                                            return;
+                                        }
+                                        System.out.print(" transform to Insert "+((Insert)operation).getCharacter()
+                                                +" at "+((Insert)operation).getPosition());
+                                        break;
+                                    case Delete:
+                                        System.out.print("User"+userId+": Operation from User"+ operation.getUserID()+" Delete "+" at "+((Delete)operation).getPosition());
+                                        operation = Application.T(operation, log);
+                                        if(operation == null) {
+                                            System.out.print(" No Operation!");
+                                            return;
+                                        }
+                                        System.out.print(" transform to Delete at "+((Delete)operation).getPosition());
+                                        break;
+                                }
+                                printStateVector(operation.getStateVector());
+                            }
+                        }
+                    }
+                    out.tell(mapper.writeValueAsString(operation), getSelf());
+                    requestLog.add(0, operation);
+                    if(operation.getUserID() >= stateVectors.size()) {
+                        for(int i=0; i<operation.getUserID()-stateVectors.size()+1; i++)
+                            stateVectors.add(0);
+                    }
+
+                    stateVectors.set(operation.getUserID(), stateVectors.get(operation.getUserID())+1);
+                    switch(operation.getType()){
+                        case Insert:
+                            System.out.print("User"+userId+": Execute operation from User"+ operation.getUserID()+" Insert "+((Insert)operation).getCharacter()
+                                    +" at "+((Insert)operation).getPosition());
+                            break;
+                        case Delete:
+                            System.out.print("User"+userId+": Execute operation from User"+ operation.getUserID()+" Delete "+" at "+((Delete)operation).getPosition());
+                            break;
+                    }
+                    printStateVector(operation.getStateVector());
+                    System.out.print("User"+userId+" StateVector: ");
+                    printStateVector(stateVectors);
+                }
             }
         }
         else {
@@ -129,6 +183,30 @@ public class UserActor extends UntypedActor {
         System.out.println("User" + userId+ ": Exit");
         doc.tell(new Exit(userId), getSelf());
         cancellable.cancel();
+    }
+
+    private int compareStateVector(ArrayList<Integer> s1, ArrayList<Integer> s2) {
+        if(s1.size() > s2.size())
+            return 1;
+        else if(s1.size() == s2.size()) {
+            int flag = 0;
+            for(int i=0; i<s1.size(); i++) {
+                if(s1.get(i) > s2.get(i))
+                    return 1;
+                if(s1.get(i) < s2.get(i))
+                    flag = 1;
+            }
+            if(flag == 0)
+                return 0;
+        }
+        return -1;
+    }
+
+    private void printStateVector(ArrayList<Integer> sv) {
+        System.out.print(" [");
+        for(int i=0; i<sv.size(); i++)
+            System.out.print(sv.get(i)+" ");
+        System.out.println("]");
     }
 
 }

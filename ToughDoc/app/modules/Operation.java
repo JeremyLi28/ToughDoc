@@ -32,5 +32,11 @@ public abstract class Operation implements Serializable{
     }
 
     public Type getType() { return type; }
+
+    public ArrayList<Integer> getStateVector() {
+        return stateVector;
+    }
+
+    public int getPriority() { return priority; }
 }
 

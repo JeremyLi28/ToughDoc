@@ -16,11 +16,21 @@ public class Insert extends Operation{
         this.position = position;
     }
 
+    public Insert(Insert insert) {
+        super(insert.getUserID(), insert.getStateVector(), insert.getType(), insert.getPriority(), insert.getDocID());
+        this.character = insert.character;
+        this.position = insert.position;
+    }
+
     public String getCharacter(){
         return character;
     }
 
     public int getPosition() {
         return position;
+    }
+
+    public void setPosition(int pos) {
+        position = pos;
     }
 }

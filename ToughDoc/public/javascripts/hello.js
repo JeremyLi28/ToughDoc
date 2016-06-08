@@ -63,4 +63,8 @@ app.controller('appCtrl', function($scope){
         }));
         $scope.ws.send(query);
     };
+
+    $scope.$watch('$scope.text', function (newVal, oldVal) {
+        console.log(newVal);
+    })
 });
