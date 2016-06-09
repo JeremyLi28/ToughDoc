@@ -4,6 +4,8 @@ app.controller('appCtrl', function($scope){
     $scope.ws = new WebSocket("ws://localhost:9000/ws");
     $scope.text = "";
     $scope.userId = -1;
+    $scope.delay = 0;
+    $scope.logs = []
 
     String.prototype.insert = function(idx, str) {
         return this.slice(0, idx) + str + this.slice(idx);
@@ -25,14 +27,18 @@ app.controller('appCtrl', function($scope){
                 }
                 case "Insert":
                 {
-                    if($scope.userId != $scope.json.userId)
+                    if($scope.userId != $scope.json.userId) {
                         $scope.text = $scope.text.insert($scope.json.position, $scope.json.character);
+                        $scope.logs.push("User"+$scope.json.userId+": Insert " + $scope.json.character + " at " + $scope.json.position)
+                    }
                     break;
                 }
                 case "Delete":
                 {
-                    if($scope.userId != $scope.json.userId)
+                    if($scope.userId != $scope.json.userId) {
                         $scope.text = $scope.text.delete($scope.json.position);
+                        $scope.logs.push("User"+$scope.json.userId+": Delete at " + $scope.json.position)
+                    }
                     break;
                 }
             }
@@ -77,7 +83,6 @@ app.controller('appCtrl', function($scope){
     };
 
     $scope.$watch('text', function (newVal, oldVal) {
-        console.log($scope.text)
         var i = 0;
         if(!newVal)
           return;
@@ -92,7 +97,11 @@ app.controller('appCtrl', function($scope){
                 }
             }
             console.log("Insert " + newVal[i] + " at " + i);
-            $scope.insert(newVal[i], i);
+            $scope.logs.push("User"+$scope.userId+": Insert " + newVal[i] + " at " + i)
+            setTimeout(function () {
+                $scope.insert(newVal[i], i);
+            }, $scope.delay*1000);
+
         }
         else if (newVal.length < oldVal.length) {
             for (i = 0; i < newVal.length; i++) {
@@ -101,7 +110,11 @@ app.controller('appCtrl', function($scope){
                 }
             }
             console.log("Delete " + oldVal[i] + " at " + i);
-            $scope.delete(i);
+            $scope.logs.push("User"+$scope.userId+": Delete at " + i)
+            setTimeout(function () {
+                $scope.delete(i);
+            }, $scope.delay*1000);
+
         }
         // else {
         //     for (i = 0; i < newVal.length; i++) {

@@ -16,8 +16,25 @@
      * template and passing a `String` message.
      *@
     <div class = "container-fluid" ng-controller="appCtrl">
-        <img src=@routes.Assets.versioned("images/logo.png") style="width:280px">
-        @*<div class="row">*@
+        <div class="row">
+            <nav class="navbar navbar-default" style="background-color: white">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <a class="navbar-brand" href="#" style="height: 130px">
+                            <img src=@routes.Assets.versioned("images/logo.png") style="width:280px">
+                        </a>
+                    </div>
+                    <div class="collapse navbar-collapse">
+                        <form class="navbar-form navbar-left" role="search" style="margin-top: 40px; margin-left: 20px;">
+                            <div class="form-group">
+                                <input type="text" class="form-control" ng-model="delay" placeholder="Input time delay here...">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </nav>
+        </div>
+                @*<div class="row">*@
             @*<form class="form-inline container" id="create-doc-form" ng-submit="createDoc()">*@
                 @*<h1> CreateDoc </h1>*@
                 @*<div class="form-group">*@
@@ -80,12 +97,24 @@
             @*</form>*@
         @*</div>*@
         <div class="row">
-            <div id="result" class="container">
-                <textarea ng-model="text" ng-trim="false" rows="20" cols="180">
+            <div id="result" class="col-md-8">
+                <textarea ng-model="text" ng-trim="false" rows="25" cols="150" style="top: 150px" class="form-control">
                 </textarea>
             </div>
+            <div class="col-md-4">
+                <pre style="height: 514px; line-height: 0.5; overflow-y: scroll;">
+                    <p>Information: </p>
+                    <ul>
+                        <li>UserID: {{ userId}}</li>
+                        <li>Delay: {{ delay }} </li>
+                    </ul>
+                    <p>Log: </p>
+                    <ol>
+                        <li ng-repeat="log in logs track by $index" style="line-height: 1.0"> {{ log }}</li>
+                    </ol>
+                </pre>
+            </div>
         </div>
-        <p> UserID: {{ userId}}</p>
     </div>
 
 }
