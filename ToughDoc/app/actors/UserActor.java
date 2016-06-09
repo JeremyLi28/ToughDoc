@@ -66,12 +66,14 @@ public class UserActor extends UntypedActor {
                 case "Insert":
                     Insert insert = new Insert(userId, new ArrayList<>(stateVectors), priority, docId, json.get("character").asText(), json.get("position").asInt());
                     requestQueue.add(insert);
+                    Thread.sleep(json.get("delay").asInt()*1000);
                     doc.tell(insert, getSelf());
                     System.out.println("User"+userId+": Receive Insert from front-end");
                     break;
                 case "Delete":
                     Delete delete = new Delete(userId, new ArrayList<>(stateVectors), priority, docId, json.get("position").asInt());
                     requestQueue.add(delete);
+                    Thread.sleep(json.get("delay").asInt()*1000);
                     doc.tell(delete, getSelf());
                     System.out.println("User"+userId+": Receive Delete from front-end");
                     break;
@@ -151,7 +153,8 @@ public class UserActor extends UntypedActor {
                         }
                     }
                     out.tell(mapper.writeValueAsString(operation), getSelf());
-                    requestLog.add(0, operation);
+                    operation.setStateVector(new ArrayList<>(stateVectors));
+                    requestLog.add(operation);
                     if(operation.getUserId() >= stateVectors.size()) {
                         for(int i=0; i<operation.getUserId()-stateVectors.size()+1; i++)
                             stateVectors.add(0);

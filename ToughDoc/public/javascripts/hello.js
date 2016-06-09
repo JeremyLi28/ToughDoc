@@ -5,7 +5,7 @@ app.controller('appCtrl', function($scope){
     $scope.text = "";
     $scope.userId = -1;
     $scope.delay = 0;
-    $scope.logs = []
+    $scope.logs = [];
 
     String.prototype.insert = function(idx, str) {
         return this.slice(0, idx) + str + this.slice(idx);
@@ -65,26 +65,28 @@ app.controller('appCtrl', function($scope){
         $scope.ws.send(query);
     };
     
-    $scope.insert = function(char, insert_pos){
+    $scope.insert = function(char, insert_pos, delay){
         var query = (JSON.stringify({
             type: "Insert",
             character: char,
-            position: insert_pos
+            position: insert_pos,
+            delay: delay
         }));
         $scope.ws.send(query);
     };
     
-    $scope.delete = function(delete_pos){
+    $scope.delete = function(delete_pos, delay){
         var query = (JSON.stringify({
             type: "Delete",
-            position: delete_pos
+            position: delete_pos,
+            delay: delay
         }));
         $scope.ws.send(query);
     };
 
     $scope.$watch('text', function (newVal, oldVal) {
         var i = 0;
-        if(!newVal)
+        if(newVal == null || $scope.json == null)
           return;
         if($scope.userId != $scope.json.userId) {
             $scope.json.userId = $scope.userId;
@@ -96,11 +98,8 @@ app.controller('appCtrl', function($scope){
                     break;
                 }
             }
-            console.log("Insert " + newVal[i] + " at " + i);
-            $scope.logs.push("User"+$scope.userId+": Insert " + newVal[i] + " at " + i)
-            setTimeout(function () {
-                $scope.insert(newVal[i], i);
-            }, $scope.delay*1000);
+            $scope.logs.push("User"+$scope.userId+": Insert " + newVal[i] + " at " + i);
+            $scope.insert(newVal[i], i, $scope.delay);
 
         }
         else if (newVal.length < oldVal.length) {
@@ -109,23 +108,10 @@ app.controller('appCtrl', function($scope){
                     break;
                 }
             }
-            console.log("Delete " + oldVal[i] + " at " + i);
-            $scope.logs.push("User"+$scope.userId+": Delete at " + i)
-            setTimeout(function () {
-                $scope.delete(i);
-            }, $scope.delay*1000);
+            $scope.logs.push("User"+$scope.userId+": Delete at " + i);
+            $scope.delete(i, $scope.delay);
 
         }
-        // else {
-        //     for (i = 0; i < newVal.length; i++) {
-        //         if(newVal[i] != oldVal[i]) {
-        //             break;
-        //         }
-        //     }
-        //     console.log("Update " + oldVal[i] + " at " + i + " to "+newVal[i]);
-        //     $scope.delete(i);
-        //     $scope.insert(newVal[i], i);
-        // }
     })
 
 

@@ -38,5 +38,9 @@ public abstract class Operation implements Serializable{
     }
 
     public int getPriority() { return priority; }
+
+    public void setStateVector(ArrayList<Integer> sv) {
+        stateVector = sv;
+    }
 }
 

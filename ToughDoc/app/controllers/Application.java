@@ -78,7 +78,7 @@ public class Application extends Controller {
     }
 
     private static Insert T12(Insert op1, Delete op2) {
-        if(op1.getPosition() < op2.getPosition())
+        if(op1.getPosition() <= op2.getPosition())
             return op1;
         else {
             Insert new_op = new Insert(op1);
