@@ -77,6 +77,7 @@ app.controller('appCtrl', function($scope){
     };
 
     $scope.$watch('text', function (newVal, oldVal) {
+        console.log($scope.text)
         var i = 0;
         if(!newVal)
           return;
