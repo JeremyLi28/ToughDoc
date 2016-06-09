@@ -2,6 +2,7 @@ package controllers;
 
 import modules.*;
 import play.*;
+import play.api.libs.iteratee.RunQueue;
 import play.mvc.*;
 import akka.actor.*;
 import play.libs.F.*;
@@ -29,6 +30,84 @@ public class Application extends Controller {
     public static final ActorSystem system = ActorSystem.create("ToughDoc");
     private final DocBus bus = new DocBus();
     private final ActorRef doc = system.actorOf(Props.create(DocActor.class, bus), "doc");
+
+    // Transformation functions
+    public static Operation T(Operation op1, Operation op2) {
+        switch (op1.getType()) {
+            case Insert: {
+                switch (op2.getType()) {
+                    case Insert:
+                        return T11((Insert)op1, (Insert)op2);
+                    case Delete:
+                        return T12((Insert)op1, (Delete)op2);
+                }
+            }
+            case Delete: {
+                switch (op2.getType()) {
+                    case Insert:
+                        return T21((Delete)op1, (Insert)op2);
+                    case Delete:
+                        return T22((Delete)op1, (Delete)op2);
+                }
+            }
+        }
+        return op1;
+    }
+
+    private static Insert T11(Insert op1, Insert op2) {
+        if(op1.getPosition() < op2.getPosition())
+            return op1;
+        else if(op1.getPosition() > op2.getPosition()) {
+            Insert new_op = new Insert(op1);
+            new_op.setPosition(op1.getPosition() + op2.getCharacter().length());
+            return new_op;
+        }
+        else {
+            if(op1.getCharacter().equals(op2.getCharacter()))
+                return null;
+            else {
+                if(op1.getPriority() < op2.getPriority())
+                    return op1;
+                else {
+                    Insert new_op = new Insert(op1);
+                    new_op.setPosition(op1.getPosition() + op2.getCharacter().length());
+                    return new_op;
+                }
+            }
+        }
+    }
+
+    private static Insert T12(Insert op1, Delete op2) {
+        if(op1.getPosition() <= op2.getPosition())
+            return op1;
+        else {
+            Insert new_op = new Insert(op1);
+            new_op.setPosition(op1.getPosition()-1);
+            return new_op;
+        }
+    }
+
+    private static Delete T21(Delete op1, Insert op2) {
+        if(op1.getPosition() < op2.getPosition())
+            return op1;
+        else {
+            Delete new_op = new Delete(op1);
+            new_op.setPosition(op1.getPosition()+op2.getCharacter().length());
+            return new_op;
+        }
+    }
+
+    private static Delete T22(Delete op1, Delete op2) {
+        if(op1.getPosition() < op2.getPosition())
+            return op1;
+        else if(op1.getPosition() > op2.getPosition()) {
+            Delete new_op = new Delete(op1);
+            new_op.setPosition(op1.getPosition() - 1);
+            return new_op;
+        }
+        else
+            return null;
+    }
 
 
 
@@ -61,6 +140,8 @@ public class Application extends Controller {
             this.docId = docId;
         }
     }
+
+    public static class Execute implements Serializable {}
 
     // doc message
     public static class AllowJoin implements Serializable {

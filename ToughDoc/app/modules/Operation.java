@@ -1,6 +1,8 @@
 package modules;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+
 import controllers.Application.*;
 
 /**
@@ -11,20 +13,34 @@ import controllers.Application.*;
 public abstract class Operation implements Serializable{
 
     private int docID;
-    private int userID;
+    private int userId;
     private Type type;
-    public Operation(int userID, int docID, Type type) {
-        this.userID = userID;
-        this.docID = docID;
+    private ArrayList<Integer> stateVector;
+    private int priority;
+    public Operation(int userID,ArrayList<Integer> stateVector, Type type , int priority, int docID) {
+        this.userId = userID;
         this.type = type;
+        this.stateVector = stateVector;
+        this.priority = priority;
+        this.docID = docID;
     }
 
-    public int getUserID() { return userID; }
+    public int getUserId() { return userId; }
 
     public int getDocID() {
         return docID;
     }
 
     public Type getType() { return type; }
+
+    public ArrayList<Integer> getStateVector() {
+        return stateVector;
+    }
+
+    public int getPriority() { return priority; }
+
+    public void setStateVector(ArrayList<Integer> sv) {
+        stateVector = sv;
+    }
 }
 

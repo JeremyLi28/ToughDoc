@@ -40,10 +40,10 @@ public class DocActor extends UntypedActor {
             ActorRef user = getSender();
             log.info("new user join");
             System.out.println("Doc: Receive New User Join, assign ID" + userCount + "send grant");
-            userCount++;
             users.put(userCount, user);
             getContext().watch(user);
             user.tell(new AllowJoin(userCount), getSelf());
+            userCount++;
         }
         else if (message instanceof Exit) {
             log.info("remove user");
@@ -67,11 +67,13 @@ public class DocActor extends UntypedActor {
             user.tell(new AllowLeaveDoc(((LeaveDoc) message).docId), getSelf());
         }
         else if (message instanceof Insert) {
-            System.out.println("Doc: Receive Insert request from user"+((Insert) message).getUserID()+": Insert " + ((Insert) message).getCharacter()+" at "+((Insert) message).getPosition()+" for "+((Insert) message).getDocID());
+            System.out.println("Doc: Receive Insert request from user"+((Insert) message).getUserId()+": Insert " + ((Insert) message).getCharacter()+" at "+((Insert) message).getPosition()+" for "+((Insert) message).getDocID());
+//            Thread.sleep(5000);
             bus.publish((Insert)message);
         }
         else if (message instanceof Delete) {
-            System.out.println("Doc: Receive Delete request from user"+((Delete) message).getUserID()+": Delete character at "+((Delete) message).getPosition()+" for "+((Delete) message).getDocID());
+            System.out.println("Doc: Receive Delete request from user"+((Delete) message).getUserId()+": Delete character at "+((Delete) message).getPosition()+" for "+((Delete) message).getDocID());
+//            Thread.sleep(5000);
             bus.publish((Delete)message);
         }
         else {
