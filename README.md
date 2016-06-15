@@ -1,5 +1,5 @@
 # ToughDoc
-
+![screenshot](https://raw.githubusercontent.com/JeremyLi28/ToughDoc/master/ToughDoc/public/images/screenshot.png)
 ### Introduction
 
 A Collaborative Editor Application based on [Play](https://www.playframework.com) and [Akka](http://akka.io) with the [Opeartional Transformation Model](https://en.wikipedia.org/wiki/Operational_transformation).
